@@ -1,5 +1,5 @@
 # clean base image containing only comfyui, comfy-cli and comfyui-manager
-FROM runpod/worker-comfyui:5.10.0-base
+FROM runpod/worker-comfyui:5.11.0-base
 
 # build-time tokens for gated downloads are read from BuildKit secret
 # mounts — they are never written to a layer or to image history.
