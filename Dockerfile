@@ -6,9 +6,9 @@ FROM runpod/worker-comfyui:5.10.0-base
 # pass via: docker buildx build --secret id=hf_token,env=HF_TOKEN .
 
 COPY handler.py /handler.py
-COPY workflow_api.json /workflow_api.json
+COPY workflow.json /workflow.json
 
-ENV WORKFLOW_PATH=/workflow_api.json
+ENV WORKFLOW_PATH=/workflow.json
 ENV NETWORK_VOLUME_DEBUG=true
 
 # download models into comfyui
