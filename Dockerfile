@@ -1,9 +1,15 @@
 # clean base image containing only comfyui, comfy-cli and comfyui-manager
-FROM runpod/worker-comfyui:5.10.0-base
+FROM runpod/worker-comfyui:5.11.0-base
 
 # build-time tokens for gated downloads are read from BuildKit secret
 # mounts — they are never written to a layer or to image history.
 # pass via: docker buildx build --secret id=hf_token,env=HF_TOKEN .
+
+COPY handler.py /handler.py
+COPY workflow_api.json /workflow_api.json
+
+ENV WORKFLOW_PATH=/workflow_api.json
+ENV NETWORK_VOLUME_DEBUG=true
 
 # download models into comfyui
 RUN --mount=type=secret,id=hf_token BACKOFFS="10 20 30 60 90" && for i in 1 2 3 4 5; do HF_TOKEN="$(cat /run/secrets/hf_token 2>/dev/null || true)" comfy model download --url 'https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors' --relative-path models/diffusion_models --filename 'minimax_h3_fl2va_pruned_int8_convrot.safetensors' && break; if [ $i -eq 5 ]; then echo "model-download failed after 5 attempts" >&2; exit 1; fi; SLEEP=$(echo $BACKOFFS | cut -d ' ' -f $i) && echo "model-download attempt $i failed; retrying in $SLEEP seconds" >&2; sleep $SLEEP; done
